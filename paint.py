@@ -34,13 +34,15 @@ class App:
     def update(self):
         if pyxel.btn(pyxel.KEY_DELETE):
             self.pred_digit = None
-            x,y = pyxel.mouse_x, pyxel.mouse_y
+            # Change each pixel's color to white
             for y in range(pyxel.height):
                 for x in range(pyxel.width):
                     self.windowData[y][x] = 0
 
         if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON, hold=2, period=1):
-            # *みたいな筆跡
+            # Draw a line
+            # This change pixel's colors like a star(*)
+            # (the center is (mouse_x,mouse_y))
             x, y = pyxel.mouse_x, pyxel.mouse_y
             dx = [-3,-2,-1, 0, 0, 0,0,0,0,0,1,2,3,-1,-1,1,1,-2,-2,2,2]
             dy = [ 0, 0, 0,-3,-2,-1,0,1,2,3,0,0,0,-1,1,-1,1,2,-2,2,-2]
@@ -50,19 +52,26 @@ class App:
                     self.windowData[ny][nx] = -1
 
         if pyxel.btn(pyxel.KEY_S):
+            # save image and recognize the digit
             self._saveImage()
             self.pred_digit = model.load_predict()
 
 
     def draw(self):
         pyxel.cls(pyxel.COLOR_WHITE)
+        # show window
         for y in range(pyxel.height):
             for x in range(pyxel.width):
                 if self.windowData[y][x]==-1:
                     pyxel.pix(x, y, pyxel.COLOR_BLACK)
+
         pyxel.text(0, 0, 'PREDICT: {}'.format(self.pred_digit), pyxel.COLOR_RED)
 
+
     def _saveImage(self):
+        """ save 64x64 window's image into 8x8 picture
+        The file name is 'screen_shot.png'
+        """
         img = Image.new('RGB', (pyxel.width, pyxel.height))
         for y in range(pyxel.height):
             for x in range(pyxel.width):
